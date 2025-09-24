@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>majesty.seniors.27</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e0e7ef;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .form-container, .boarding-pass {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      padding: 20px;
+      max-width: 420px;
+      width: 100%;
+      border: 2px solid #003366;
+      position: relative;
+    }
+    .title {
+      text-align: center;
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #003366;
+      margin-bottom: 10px;
+    }
+    .info {
+      margin: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed #ccc;
+      padding-bottom: 6px;
+    }
+    .label {
+      font-weight: bold;
+      color: #003366;
+    }
+    .value {
+      color: #333;
+    }
+    .footer {
+      margin-top: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #qrcode {
+      width: 70px;
+      height: 70px;
+    }
+    .seat {
+      font-weight: bold;
+      color: #003366;
+      font-size: 1.2em;
+      padding: 8px 14px;
+      border: 2px solid #003366;
+      border-radius: 8px;
+      background: #e6f0ff;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .seat:hover {
+      background: #ccdfff;
+    }
+    /* Form styling */
+    .form-container input, .form-container select {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .form-container button {
+      background: #003366;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1em;
+    }
+    .form-container button:hover {
+      background: #002244;
+    }
+  </style>
+</head>
+<body>
+  <!-- Input Form -->
+  <div class="form-container" id="formPage">
+    <div class="title">?? majesty.seniors.27</div>
+    <label for="name">Enter Your Name:</label>
+    <input type="text" id="name" placeholder="Your Name" required>
+    <label for="grade">Choose Your Grade:</label>
+    <select id="grade" required>
+      <option value="">-- Select Grade --</option>
+      <option value="Y10">Y10</option>
+      <option value="G11">G11</option>
+    </select>
+    <button onclick="generatePass()">Generate Boarding Pass</button>
+  </div>
+
+  <!-- Boarding Pass -->
+  <div class="boarding-pass" id="boardingPass" style="display:none;">
+    <div class="title">?? Seniors 27 Boarding Pass</div>
+    <div class="info"><span class="label">Passenger:</span><span class="value" id="passengerName"></span></div>
+    <div class="info"><span class="label">From:</span><span class="value">Majesty International School</span></div>
+    <div class="info"><span class="label">To:</span><span class="value">University</span></div>
+    <div class="info"><span class="label">Flight:</span><span class="value">Grade 12</span></div>
+    <div class="info"><span class="label">Take Off:</span><span class="value">2026</span></div>
+    <div class="info"><span class="label">Landing:</span><span class="value">2027</span></div>
+    
+    <div class="footer">
+      <div id="qrcode"></div>
+      <!-- Seat as a clickable link -->
+      <a id="seatName" class="seat" target="_blank"></a>
+    </div>
+  </div>
+
+  <!-- QRCode library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <script>
+    function generatePass() {
+      const name = document.getElementById("name").value;
+      const grade = document.getElementById("grade").value;
+
+      if (!name || !grade) {
+        alert("Please enter your name and select your grade.");
+        return;
+      }
+
+      // Hide form and show boarding pass
+      document.getElementById("formPage").style.display = "none";
+      document.getElementById("boardingPass").style.display = "block";
+
+      // Fill in boarding pass details
+      document.getElementById("passengerName").textContent = name;
+      const seat = document.getElementById("seatName");
+      seat.textContent = "Seat " + grade;
+      seat.href = "https://www.instagram.com/majesty.seniors.27?igsh=bnA4aGc0OHF3bTFw&utm_source=qr";
+
+      // Generate QR Code
+      document.getElementById("qrcode").innerHTML = "";
+      new QRCode(document.getElementById("qrcode"), {
+        text: "https://www.instagram.com/majesty.seniors.27?igsh=bnA4aGc0OHF3bTFw&utm_source=qr",
+        width: 70,
+        height: 70
+      });
+    }
+  </script>
+</body>
+</html>

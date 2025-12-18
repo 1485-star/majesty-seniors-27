@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chunk & Chew – Spin & Win</title>
+<style>
+body{margin:0;font-family:Poppins,Arial,sans-serif;background:#f6d2b8;display:flex;justify-content:center;align-items:center;min-height:100vh}
+.container{background:#fff3e6;padding:20px;border-radius:22px;width:100%;max-width:360px;box-shadow:0 15px 35px rgba(0,0,0,.2);text-align:center}
+h1{color:#6b3e26;margin:8px 0;font-size:28px}
+p{color:#8a5a3c;font-weight:600;margin:0 0 12px}
+.wheel-area{position:relative;width:260px;height:260px;margin:20px auto}
+.arrow{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%) rotate(180deg);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:28px solid #6b3e26;z-index:10}
+#wheel{width:100%;height:100%;border:6px solid #6b3e26;border-radius:50%;transition:transform 4s cubic-bezier(.25,1,.5,1)}
+.center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:42px}
+button{background:#6b3e26;color:white;border:none;padding:12px 32px;border-radius:26px;font-size:16px;font-weight:700;cursor:pointer}
+.result{margin-top:14px;min-height:26px;font-size:18px;font-weight:700;color:#6b3e26}
+input{width:85%;padding:10px;margin:8px 0;border-radius:10px;border:1px solid #6b3e26}
+</style>
+</head>
+<body>
+
+<!-- QR LANDING -->
+<div class="container" id="formPage">
+<h1>Chunk & Chew</h1>
+<p>Scan • Enter • Spin 🍪</p>
+<input id="name" placeholder="Your name">
+<input id="email" type="email" placeholder="Your email">
+<button id="continueBtn">Continue</button>
+</div>
+
+<!-- WHEEL -->
+<div class="container" id="wheelPage" style="display:none">
+<h1>Chunk & Chew</h1>
+<p>Spin the wheel 🍪</p>
+<div class="wheel-area">
+<div class="arrow"></div>
+<svg id="wheel" viewBox="0 0 200 200">
+  <path d="M100 100 L100 0 A100 100 0 0 1 200 100 Z" fill="#c97c5d" />
+  <path d="M100 100 L200 100 A100 100 0 0 1 100 200 Z" fill="#a97142" />
+  <path d="M100 100 L100 200 A100 100 0 0 1 0 100 Z" fill="#f1c27d" />
+  <path d="M100 100 L0 100 A100 100 0 0 1 100 0 Z" fill="#8b5a2b" />
+
+  <text x="145" y="55" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">🎉 Buy 1<tspan x="145" dy="12">Get 1</tspan></text>
+  <text x="155" y="145" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">🔄 Try<tspan x="155" dy="12">Again</tspan></text>
+  <text x="55" y="155" fill="#6b3e26" font-size="10" font-weight="700" text-anchor="middle">🎁 Free<tspan x="55" dy="12">Item</tspan></text>
+  <text x="45" y="55" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">🍪 Buy 2<tspan x="45" dy="12">Get 2</tspan></text>
+</svg>
+<div class="center">🍪</div>
+</div>
+<button id="spinBtn">Spin</button>
+<div id="result" class="result"></div>
+</div>
+
+<!-- WIN PAGE -->
+<div class="container" id="winPage" style="display:none">
+<h1>🎉 Congratulations!</h1>
+<p id="winText"></p>
+<p>Show this to the cashier 🍪</p>
+</div>
+
+<script>
+const formPage=document.getElementById('formPage');
+const wheelPage=document.getElementById('wheelPage');
+const wheel=document.getElementById('wheel');
+const result=document.getElementById('result');
+const spinBtn=document.getElementById('spinBtn');
+const continueBtn=document.getElementById('continueBtn');
+const nameInput=document.getElementById('name');
+const emailInput=document.getElementById('email');
+
+let rotation=0;
+let spinning=false;
+let usedEmails = JSON.parse(localStorage.getItem('usedEmails') || '[]');
+
+continueBtn.onclick=()=>{
+  if(!nameInput.value || !emailInput.value){
+    alert('Please enter name and email');
+    return;
+  }
+  if(usedEmails.includes(emailInput.value)){
+    alert('This email has already used the wheel.');
+    return;
+  }
+  usedEmails.push(emailInput.value);
+  localStorage.setItem('usedEmails', JSON.stringify(usedEmails));
+  formPage.style.display='none';
+  wheelPage.style.display='block';
+};
+
+spinBtn.onclick=()=>{
+  if(spinning) return;
+  spinning=true;
+  result.textContent='';
+
+  const allAngles = [45, 135, 225, 315]; // all slices
+  const chosen = allAngles[Math.floor(Math.random()*allAngles.length)];
+  rotation += 360*5 + chosen;
+  wheel.style.transform = `rotate(${rotation}deg)`;
+
+  setTimeout(()=>{
+    const final=(rotation%360+360)%360;
+    const hit=(180-final+360)%360; // arrow points DOWN
+
+    let prize='';
+    let isWin=false;
+
+    if(hit>=0 && hit<90){ prize='🎉 Buy One Get One Free'; isWin=true; }
+    else if(hit>=90 && hit<180){ prize='🔄 Try Again'; }
+    else if(hit>=180 && hit<270){ prize='🎁 Free Item'; isWin=true; }
+    else { prize='🍪 Buy Two Get Two Free'; isWin=true; }
+
+    result.textContent=prize;
+
+    if(isWin){
+      spinBtn.disabled=false;
+      spinBtn.textContent='Won 🎉';
+      spinBtn.onclick=()=>{
+        document.getElementById('wheelPage').style.display='none';
+        document.getElementById('winPage').style.display='block';
+        document.getElementById('winText').textContent=`You have won: ${prize}`;
+      };
+    }else{
+      spinBtn.style.display='none';
+      const tryBtn=document.createElement('button');
+      tryBtn.textContent='Try Again';
+      tryBtn.onclick=()=>{
+        tryBtn.remove();
+        spinBtn.style.display='inline-block';
+        result.textContent='';
+        wheel.style.transform='rotate(0deg)';
+        rotation=0;
+      };
+      document.getElementById('wheelPage').appendChild(tryBtn);
+    }
+
+    spinning=false;
+  },4000);
+};
+</script>
+</body>
+</html>
